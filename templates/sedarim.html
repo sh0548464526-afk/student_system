@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<form method='post'><input name='name'><input name='start_time'><input name='amount'><input name='deduction'><input name='late_minutes'><button>שמור</button></form><table class='table'>{% for r in data %}<tr><td>{{r.name}}</td></tr>{% endfor %}</table>{% endblock %}

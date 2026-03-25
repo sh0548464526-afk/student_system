@@ -1,22 +1,29 @@
 
 from flask import Flask, render_template, request, redirect, session, send_file
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, time
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import os
 from openpyxl import Workbook
 
 app = Flask(__name__)
-app.secret_key = "secret"
+app.secret_key = os.getenv("SECRET_KEY", "secret")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL", "sqlite:///db.sqlite3")
+db_url = os.getenv("DATABASE_URL", "sqlite:///db.sqlite3")
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
-# ================= MODELS =================
+# ========= MODELS =========
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100))
+    password = db.Column(db.String(200))
 
 class Student(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,7 +52,7 @@ class Attendance(db.Model):
     s3 = db.Column(db.String(5))
     total = db.Column(db.Float)
 
-# ================= LOGIC =================
+# ========= LOGIC =========
 
 def calc_total(att):
     sedarim = Seder.query.all()
@@ -59,43 +66,46 @@ def calc_total(att):
         seder = sedarim[i]
 
         try:
-            arrival = datetime.strptime(t, "%H:%M").time()
-            start = datetime.strptime(seder.start_time, "%H:%M").time()
+            arrival = datetime.strptime(t, "%H:%M")
+            start = datetime.strptime(seder.start_time, "%H:%M")
 
-            diff = (datetime.combine(datetime.today(), arrival) -
-                    datetime.combine(datetime.today(), start)).seconds / 60
+            diff = (arrival - start).total_seconds() / 60
 
             if diff <= 0:
                 total += seder.amount
             else:
-                deduction_units = diff // seder.late_minutes
-                total += max(0, seder.amount - deduction_units * seder.deduction)
+                units = diff // seder.late_minutes
+                total += max(0, seder.amount - units * seder.deduction)
 
         except:
             pass
 
     return round(total, 2)
 
-# ================= ROUTES =================
+# ========= AUTH =========
 
 @app.route("/", methods=["GET","POST"])
 def login():
     if request.method == "POST":
-        u = User.query.filter_by(
-            username=request.form["username"],
-            password=request.form["password"]
-        ).first()
-        if u:
-            session["user"] = u.username
+        user = User.query.filter_by(username=request.form["username"]).first()
+        if user and check_password_hash(user.password, request.form["password"]):
+            session["user"] = user.username
             return redirect("/students")
     return render_template("login.html")
+
+# ========= STUDENTS =========
 
 @app.route("/students", methods=["GET","POST"])
 def students():
     if request.method == "POST":
-        db.session.add(Student(name=request.form["name"], tz=request.form["tz"]))
+        db.session.add(Student(
+            name=request.form["name"],
+            tz=request.form["tz"]
+        ))
         db.session.commit()
     return render_template("students.html", data=Student.query.all())
+
+# ========= SEDARIM =========
 
 @app.route("/sedarim", methods=["GET","POST"])
 def sedarim():
@@ -103,6 +113,20 @@ def sedarim():
         db.session.add(Seder(**request.form))
         db.session.commit()
     return render_template("sedarim.html", data=Seder.query.all())
+
+# ========= DAYS =========
+
+@app.route("/days", methods=["GET","POST"])
+def days():
+    if request.method == "POST":
+        db.session.add(Day(
+            day=request.form["day"],
+            marked=("marked" in request.form)
+        ))
+        db.session.commit()
+    return render_template("days.html", data=Day.query.all())
+
+# ========= ATTENDANCE =========
 
 @app.route("/attendance", methods=["GET","POST"])
 def attendance():
@@ -120,6 +144,8 @@ def attendance():
 
     return render_template("attendance.html", data=Attendance.query.all())
 
+# ========= EXPORT =========
+
 @app.route("/export")
 def export():
     wb = Workbook()
@@ -129,21 +155,34 @@ def export():
 
     ws.append(["שם","תז","סדר1","סדר2","סדר3","סכום"])
 
-    for r in Attendance.query.all():
-        ws.append([r.name, r.tz, r.s1, r.s2, r.s3, r.total])
+    for i, r in enumerate(Attendance.query.all(), start=2):
+        ws[f"A{i}"] = r.name
+        ws[f"B{i}"] = r.tz
+        ws[f"C{i}"] = r.s1
+        ws[f"D{i}"] = r.s2
+        ws[f"E{i}"] = r.s3
 
-    name = f"עדכון נכון ל-{datetime.now().strftime('%Y-%m-%d_%H-%M')}.xlsx"
-    wb.save(name)
+        # נוסחה אמיתית
+        ws[f"F{i}"] = f"=SUM(C{i}:E{i})"
 
-    return send_file(name, as_attachment=True)
+    filename = f"עדכון נכון ל-{datetime.now().strftime('%Y-%m-%d_%H-%M')}.xlsx"
+    wb.save(filename)
 
-# ================= INIT =================
+    return send_file(filename, as_attachment=True)
+
+# ========= INIT =========
+
+with app.app_context():
+    db.create_all()
+
+    if not User.query.first():
+        db.session.add(User(
+            username="admin",
+            password=generate_password_hash("1234")
+        ))
+        db.session.commit()
+
+# ========= RUN =========
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-        if not User.query.first():
-            db.session.add(User(username="admin", password="1234"))
-            db.session.commit()
-
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=10000)

@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<form method='post'><input name='name'><input name='tz'><button>שמור</button></form><table id='t' class='table'>{% for r in data %}<tr><td>{{r.name}}</td><td>{{r.tz}}</td></tr>{% endfor %}</table>{% endblock %}

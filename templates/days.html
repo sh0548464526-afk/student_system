@@ -1,0 +1,20 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<form method="post">
+<input name="day" placeholder="יום">
+<label><input type="checkbox" name="marked"> כן</label>
+<button>שמור</button>
+</form>
+
+<input onkeyup="filterTable(this,'t',0)" placeholder="חיפוש יום">
+
+<table id="t" class="table">
+<tr><th>יום</th><th>סימון</th></tr>
+{% for r in data %}
+<tr><td>{{r.day}}</td><td>{{r.marked}}</td></tr>
+{% endfor %}
+</table>
+
+{% endblock %}
