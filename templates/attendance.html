@@ -1,44 +1,38 @@
 
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
-
 <h3>נוכחות</h3>
 
-<form method="post" class="row g-2 mb-3">
+<form method=post>
 
-<select class="form-control col" name="student_id">
+<select name=student>
 {% for s in students %}
 <option value="{{s.id}}">{{s.name}}</option>
 {% endfor %}
 </select>
 
-<input class="form-control col" name="s1" placeholder="{{sedarim[0].name if sedarim|length>0 else 'סדר1'}}">
+<select name=day>
+{% for d in days %}
+<option value="{{d.id}}">{{d.name}}</option>
+{% endfor %}
+</select>
 
-<input class="form-control col" name="s2" placeholder="{{sedarim[1].name if sedarim|length>1 else 'סדר2'}}">
+<input name=s1 placeholder="סדר1">
+<input name=s2 placeholder="סדר2">
+<input name=s3 placeholder="סדר3">
 
-<input class="form-control col" name="s3" placeholder="{{sedarim[2].name if sedarim|length>2 else 'סדר3'}}">
-
-<button class="btn btn-success col-2">שמור</button>
+<button class="btn btn-success">שמור</button>
 
 </form>
 
-<table class="table table-striped">
+<table class="table mt-3">
+<tr><th>תלמיד</th><th>יום</th><th>סכום</th></tr>
 
+{% for a in data %}
 <tr>
-<th>שם</th>
-<th>{{sedarim[0].name if sedarim|length>0 else "סדר1"}}</th>
-<th>{{sedarim[1].name if sedarim|length>1 else "סדר2"}}</th>
-<th>{{sedarim[2].name if sedarim|length>2 else "סדר3"}}</th>
-<th>סכום</th>
-</tr>
-
-{% for r in data %}
-<tr>
-<td>{{r.student.name}}</td>
-<td>{{r.s1}}</td>
-<td>{{r.s2}}</td>
-<td>{{r.s3}}</td>
-<td>{{r.total}}</td>
+<td>{{a.student.name}}</td>
+<td>{{a.day.name}}</td>
+<td>{{a.total}}</td>
 </tr>
 {% endfor %}
 

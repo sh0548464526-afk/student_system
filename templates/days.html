@@ -1,20 +1,15 @@
 
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
-
 <h3>ימים</h3>
-
-<form method="post" class="mb-3">
-<input class="form-control mb-2" name="day" placeholder="יום">
-<label><input type="checkbox" name="marked"> מסומן</label>
-<button class="btn btn-success">שמור</button>
+<form method=post>
+<input name=name placeholder="שם יום">
+<label><input type=checkbox name=active checked>פעיל</label>
+<button class="btn btn-success">הוסף</button>
 </form>
-
-<table class="table table-striped">
-<tr><th>יום</th><th>סימון</th></tr>
-{% for r in data %}
-<tr><td>{{r.day}}</td><td>{{r.marked}}</td></tr>
+<table class="table">
+{% for d in data %}
+<tr><td>{{d.name}}</td><td>{{d.active}}</td></tr>
 {% endfor %}
 </table>
-
 {% endblock %}

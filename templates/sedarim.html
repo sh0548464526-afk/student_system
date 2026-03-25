@@ -1,23 +1,23 @@
 
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% block content %}
-
 <h3>סדרים</h3>
-
-<form method="post" class="row g-2 mb-3">
-<input class="form-control col" name="name" placeholder="שם סדר">
-<input class="form-control col" name="start_time" placeholder="HH:MM">
-<input class="form-control col" name="amount" placeholder="סכום">
-<input class="form-control col" name="deduction" placeholder="קיזוז">
-<input class="form-control col" name="late_minutes" placeholder="X דקות">
-<button class="btn btn-success col-2">שמור</button>
+<form method=post>
+<input name=name placeholder="שם סדר">
+<input name=amount placeholder="סכום">
+<input name=late placeholder="דקות איחור">
+<input name=deduct placeholder="סכום קיזוז">
+<button class="btn btn-success">הוסף</button>
 </form>
-
-<table class="table table-striped">
-<tr><th>שם</th><th>התחלה</th><th>סכום</th></tr>
-{% for r in data %}
-<tr><td>{{r.name}}</td><td>{{r.start_time}}</td><td>{{r.amount}}</td></tr>
+<table class="table">
+<tr><th>שם</th><th>סכום</th><th>דקות איחור</th><th>קיזוז</th></tr>
+{% for s in data %}
+<tr>
+<td>{{s.name}}</td>
+<td>{{s.amount}}</td>
+<td>{{s.late_minutes}}</td>
+<td>{{s.deduction}}</td>
+</tr>
 {% endfor %}
 </table>
-
 {% endblock %}
