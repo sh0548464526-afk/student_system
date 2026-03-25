@@ -1,17 +1,22 @@
 
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% block content %}
+
 <h3>תלמידים</h3>
-<form method='post'>
-<input name='name' placeholder='שם'>
-<input name='tz' placeholder='ת"ז'>
-<button class='btn btn-success'>שמור</button>
+
+<form method="post" class="row g-2 mb-3">
+<input class="form-control col" name="name" placeholder="שם">
+<input class="form-control col" name="tz" placeholder="תז">
+<button class="btn btn-success col-2">שמור</button>
 </form>
-<input onkeyup="filterTable(this,'t',0)" placeholder="חיפוש שם">
-<table id='t' class='table mt-2'>
-<tr><th>שם</th><th>ת"ז</th></tr>
+
+<input class="form-control mb-2" placeholder="חיפוש" onkeyup="searchTable(this,'t',0)">
+
+<table id="t" class="table table-striped">
+<tr><th>שם</th><th>תז</th></tr>
 {% for r in data %}
 <tr><td>{{r.name}}</td><td>{{r.tz}}</td></tr>
 {% endfor %}
 </table>
+
 {% endblock %}
