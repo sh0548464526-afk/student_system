@@ -1,1 +1,22 @@
-{% extends 'base.html' %}{% block content %}<form method='post'><input name='name'><input name='tz'><input name='s1'><input name='s2'><input name='s3'><button>שמור</button></form><table class='table'>{% for r in data %}<tr><td>{{r.name}}</td><td>{{r.total}}</td></tr>{% endfor %}</table>{% endblock %}
+
+{% extends 'base.html' %}
+{% block content %}
+<h3>נוכחות</h3>
+<form method='post'>
+<select name='student_id'>
+{% for s in students %}
+<option value='{{s.id}}'>{{s.name}}</option>
+{% endfor %}
+</select>
+<input name='s1' placeholder='סדר1 HH:MM'>
+<input name='s2' placeholder='סדר2 HH:MM'>
+<input name='s3' placeholder='סדר3 HH:MM'>
+<button class='btn btn-success'>שמור</button>
+</form>
+<table class='table mt-2'>
+<tr><th>שם</th><th>סכום</th></tr>
+{% for r in data %}
+<tr><td>{{r.student.name}}</td><td>{{r.total}}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,1 +1,19 @@
-{% extends 'base.html' %}{% block content %}<form method='post'><input name='name'><input name='start_time'><input name='amount'><input name='deduction'><input name='late_minutes'><button>שמור</button></form><table class='table'>{% for r in data %}<tr><td>{{r.name}}</td></tr>{% endfor %}</table>{% endblock %}
+
+{% extends 'base.html' %}
+{% block content %}
+<h3>סדרים</h3>
+<form method='post'>
+<input name='name' placeholder='שם סדר'>
+<input name='start_time' placeholder='שעת התחלה HH:MM'>
+<input name='amount' placeholder='סכום'>
+<input name='deduction' placeholder='קיזוז'>
+<input name='late_minutes' placeholder='X דקות'>
+<button class='btn btn-success'>שמור</button>
+</form>
+<table class='table mt-2'>
+<tr><th>שם סדר</th><th>שעת התחלה</th><th>סכום</th></tr>
+{% for r in data %}
+<tr><td>{{r.name}}</td><td>{{r.start_time}}</td><td>{{r.amount}}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
