@@ -1,14 +1,16 @@
 
-{% extends 'base.html' %}
-{% block content %}
+{% extends "base.html" %}
+{% block c %}
 <h3>תלמידים</h3>
-<form method=post>
-<input name=name placeholder="שם תלמיד">
-<button class="btn btn-success">הוסף</button>
+<form method=post class=row>
+<input name=name placeholder=שם class="form-control col">
+<input name=tz placeholder="תעודת זהות" class="form-control col">
+<button class="btn btn-success col">הוסף</button>
 </form>
-<table class="table">
+<table class=table>
+<tr><th>שם</th><th>ת"ז</th></tr>
 {% for s in data %}
-<tr><td>{{s.name}}</td></tr>
+<tr><td>{{s.name}}</td><td>{{s.tz}}</td></tr>
 {% endfor %}
 </table>
 {% endblock %}

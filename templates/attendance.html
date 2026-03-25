@@ -1,41 +1,49 @@
 
-{% extends 'base.html' %}
-{% block content %}
+{% extends "base.html" %}
+{% block c %}
 <h3>נוכחות</h3>
 
-<form method=post>
-
-<select name=student>
-{% for s in students %}
-<option value="{{s.id}}">{{s.name}}</option>
-{% endfor %}
-</select>
-
-<select name=day>
+<select id=day class=form-control style="max-width:200px">
 {% for d in days %}
-<option value="{{d.id}}">{{d.name}}</option>
+<option>{{d}}</option>
 {% endfor %}
 </select>
-
-<input name=s1 placeholder="סדר1">
-<input name=s2 placeholder="סדר2">
-<input name=s3 placeholder="סדר3">
-
-<button class="btn btn-success">שמור</button>
-
-</form>
 
 <table class="table mt-3">
-<tr><th>תלמיד</th><th>יום</th><th>סכום</th></tr>
-
-{% for a in data %}
 <tr>
-<td>{{a.student.name}}</td>
-<td>{{a.day.name}}</td>
-<td>{{a.total}}</td>
+<th>תלמיד</th>
+<th>סדר1</th>
+<th>סדר2</th>
+<th>סדר3</th>
+<th></th>
+</tr>
+
+{% for s in students %}
+<tr>
+<td>{{s.name}}</td>
+<td><input type=time id="s1{{s.id}}"></td>
+<td><input type=time id="s2{{s.id}}"></td>
+<td><input type=time id="s3{{s.id}}"></td>
+<td><button onclick="save({{s.id}})" class="btn btn-success">שמור</button></td>
 </tr>
 {% endfor %}
 
 </table>
+
+<script>
+function save(id){
+fetch("/save",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+student:id,
+day:document.getElementById("day").value,
+s1:document.getElementById("s1"+id).value,
+s2:document.getElementById("s2"+id).value,
+s3:document.getElementById("s3"+id).value
+})
+})
+}
+</script>
 
 {% endblock %}

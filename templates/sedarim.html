@@ -1,22 +1,24 @@
 
-{% extends 'base.html' %}
-{% block content %}
+{% extends "base.html" %}
+{% block c %}
 <h3>סדרים</h3>
-<form method=post>
-<input name=name placeholder="שם סדר">
-<input name=amount placeholder="סכום">
-<input name=late placeholder="דקות איחור">
-<input name=deduct placeholder="סכום קיזוז">
+<form method=post class=row>
+<input name=name placeholder=שם class=form-control>
+<input name=start placeholder="שעת התחלה 18:00" class=form-control>
+<input name=amount placeholder=סכום class=form-control>
+<input name=late placeholder="דקות איחור" class=form-control>
+<input name=deduct placeholder="קיזוז" class=form-control>
 <button class="btn btn-success">הוסף</button>
 </form>
-<table class="table">
-<tr><th>שם</th><th>סכום</th><th>דקות איחור</th><th>קיזוז</th></tr>
+<table class=table>
+<tr><th>שם</th><th>התחלה</th><th>סכום</th><th>דקות איחור</th><th>קיזוז</th></tr>
 {% for s in data %}
 <tr>
 <td>{{s.name}}</td>
+<td>{{s.start}}</td>
 <td>{{s.amount}}</td>
-<td>{{s.late_minutes}}</td>
-<td>{{s.deduction}}</td>
+<td>{{s.late}}</td>
+<td>{{s.deduct}}</td>
 </tr>
 {% endfor %}
 </table>
